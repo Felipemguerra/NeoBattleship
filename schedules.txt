@@ -1,0 +1,36 @@
+Update with time and days you typically have open in your schedule.
+
+Monday:
+	Ernest: 1:30pm to Midnight
+	Felipe:
+	Brian:
+
+Tuesday:
+    Ernest: 11:45am to Midnight
+	Felipe:
+	Brian:
+    
+Wednesday:
+	Ernest: 1:30pm to Midnight
+	Felipe:
+	Brian:
+
+Thursday:
+    Ernest: 11:45am to Midnight
+	Felipe:
+	Brian:
+
+Friday:
+	Ernest: 1:30pm to Midnight
+	Felipe:
+	Brian:  
+  
+Saturday:
+	Ernest: Open all day, but heavily depends on my weekend plans
+	Felipe:
+	Brian:
+   
+Sunday:
+	Ernest: Open all day, but heavily depends on my weekend plans
+	Felipe:
+	Brian:
