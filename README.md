@@ -1,8 +1,5 @@
 NeoBattleship - Group Project (WIP)
-Members:
-Ernest Besse
-Alex
-Felipe Guerra
+Members: Ernest Besse, Alex, Felipe Guerra
 
 
 
