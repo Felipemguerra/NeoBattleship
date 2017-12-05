@@ -41,7 +41,7 @@ class gameGrid(QtWidgets.QWidget):
 	def __init__(self, parent):
 		QtWidgets.QWidget.__init__(self)
 		p = self.palette()
-		p.setColor(self.backgroundRole(), QtGui.QColor(150,177,210,255))
+		p.setColor(self.backgroundRole(), QtGui.QColor(150,150,150,255))
 		self.setPalette(p)
 		self.setAutoFillBackground(True)
 		self.setup()
@@ -62,15 +62,27 @@ class Player(QtWidgets.QWidget):
 	def __init__(self, parent):
 		QtWidgets.QWidget.__init__(self, parent)
 		self.setFixedSize(NBS_WIDTH, NBS_HEIGHT)
+		b = QtGui.QBrush(QtGui.QImage('water.bmp'))
+		p = self.palette()
+		p.setBrush(self.backgroundRole(), b)
+		self.setPalette(p)
+		self.setAutoFillBackground(True)
 		self.grid = QtWidgets.QGridLayout()
 		self.setLayout(self.grid)
 		self.grid.setSpacing(0)
 		self.holes = []		
 		self.place_holes()
+		#self.twoship = twoShip(self, [1,0], [2,0])
+		#self.threeship = threeShip(self, [0,1], [2,1])
+		#self.fourship = fourShip(self, [0,2], [3,2])
+		#self.place_ships()
 
 	def paintEvent(self, event):
 		qp = QtGui.QPainter()
 		qp.begin(self)
+		pen = qp.pen()
+		pen.setColor(QtGui.QColor(255,255,255,255))
+		qp.setPen(pen)
 		j = 10
 		dev = 10
 		for i in range(j):
@@ -81,18 +93,28 @@ class Player(QtWidgets.QWidget):
 		qp.end()
 
 	def place_holes(self):
-		for i in range(9):
-			row = []
-			for e in range(9):
-				hole = playerHole(self)
-				self.grid.addWidget(hole,i,e)
-				row.append(hole)
-			self.holes.append(row[:])
+		for col in range(9):
+			temp = []
+			for row in range(9):
+				hole = playerHole(self, row, col)
+				self.grid.addWidget(hole, row, col)
+				temp.append(hole)
+			self.holes.append(temp[:])
+
+	def place_ships(self):
+		for row in range(9):
+			for col in range(9):
+				self.holes[row][col].placement = False
 
 class Computer(QtWidgets.QWidget):
 	def __init__(self, parent):
 		QtWidgets.QWidget.__init__(self, parent)
 		self.setFixedSize(NBS_WIDTH, NBS_HEIGHT)
+		b = QtGui.QBrush(QtGui.QImage('water.bmp'))
+		p = self.palette()
+		p.setBrush(self.backgroundRole(), b)
+		self.setPalette(p)
+		self.setAutoFillBackground(True)
 		self.grid = QtWidgets.QGridLayout()
 		self.setLayout(self.grid)
 		self.grid.setSpacing(0)
@@ -108,6 +130,9 @@ class Computer(QtWidgets.QWidget):
 	def paintEvent(self, event):
 		qp = QtGui.QPainter()
 		qp.begin(self)
+		pen = qp.pen()
+		pen.setColor(QtGui.QColor(255,255,255,255))
+		qp.setPen(pen)
 		j = 10
 		dev = 10
 		for i in range(j):
@@ -117,11 +142,11 @@ class Computer(QtWidgets.QWidget):
 		qp.end()
 
 	def place_holes(self):
-		for row in range(9):
+		for col in range(9):
 			temp = []
-			for col in range(9):
-				hole = computerHole(self, col, row)
-				self.grid.addWidget(hole, col, row)
+			for row in range(9):
+				hole = computerHole(self, row, col)
+				self.grid.addWidget(hole, row, col)
 				temp.append(hole)
 			self.holes.append(temp[:])
 
@@ -180,7 +205,7 @@ class computerHole(QtWidgets.QWidget):
 		else:
 			qp = QtGui.QPainter()
 			qp.begin(self)
-			brush = QtGui.QBrush(QtGui.QColor(0,0,0,255))
+			brush = QtGui.QBrush(QtGui.QColor(255,255,255,255))
 			qp.setBrush(brush)
 			qp.drawEllipse(self.circle,self.circle,20,20)
 			qp.end()
@@ -202,12 +227,15 @@ class computerHole(QtWidgets.QWidget):
 		self.update()
 
 class playerHole(QtWidgets.QWidget):
-	def __init__(self, parent):
+	def __init__(self, parent, e, i):
 		QtWidgets.QWidget.__init__(self,parent)
 		self.peg = False
+		self.ship = False
 		self.hit = False
-		self.x = 10
-		self.y = 10
+		self.circle = 10
+		self.placement = True
+		self.x = i
+		self.y = e
 
 	def paintEvent(self, event):
 		if self.peg == True and self.hit == True:
@@ -215,41 +243,67 @@ class playerHole(QtWidgets.QWidget):
 			qp.begin(self)
 			brush = QtGui.QBrush(QtGui.QColor(255,0,0,255))
 			qp.setBrush(brush)
-			qp.drawEllipse(self.x,self.y,20,20)
+			qp.drawEllipse(self.circle,self.circle,20,20)
 			qp.end()
 		elif self.peg == True and self.hit == False:
 			qp = QtGui.QPainter()
 			qp.begin(self)
 			brush = QtGui.QBrush(QtGui.QColor(0,255,0,255))
 			qp.setBrush(brush)
-			qp.drawEllipse(self.x,self.y,20,20)
+			qp.drawEllipse(self.circle,self.circle,20,20)
 			qp.end()
 		else:
 			qp = QtGui.QPainter()
 			qp.begin(self)
-			brush = QtGui.QBrush(QtGui.QColor(0,0,0,255))
+			brush = QtGui.QBrush(QtGui.QColor(255,255,255,255))
 			qp.setBrush(brush)
-			qp.drawEllipse(self.x,self.y,20,20)
+			qp.drawEllipse(self.circle,self.circle,20,20)
 			qp.end()
 
 	def addPeg(self):
 		self.peg = True
 		self.update()
 
-class ship(QtWidgets.QWidget):
-    def __init__(self, parent):
-        QtWidgets.QWidget.__init__(self, parent)
-        self.resize(parent.size())
+	def mousePressEvent(self, event):
+		if self.placement == True:
+			p = self.palette()
+			p.setColor(self.backgroundRole(), QtGui.QColor(192,192,192,255))
+			self.setPalette(p)
+			self.setAutoFillBackground(True)
+			self.placement = False
 
-    def paintEvent(self, even):
-        qp = QtGui.QPainter()
-        qp.begin(self)
-        brush = QtGui.QBrush(QtCore.Qt.SolidPattern)
-        brush.setColor(QtCore.Qt.red)
-        qp.setBrush(brush)
-        qp.drawEllipse(QtCore.QPointF(self.width()/2, self.height()/2, 10, 10))
-        qp.end() 
-	
+"""class twoShip(QtWidgets.QWidget):
+	def __init__(self, parent, p1, p2):
+		QtWidgets.QWidget.__init__(self, parent)
+		self.resize(parent.size())
+		self.points = []
+		self.vertical = False
+		if p1[0] == p2[0]:
+			self.vertical = True	
+			for i in range(2):	
+				self.points.append([0,i])
+		else:
+			self.vertical = False
+			for i in range(2):
+				self.points.append([i,0])
+
+	def paintEvent(self, event):
+		qp = QtGui.QPainter()
+		qp.begin(self)
+		brush = QtGui.QBrush(QtGui.QColor(192,192,192,150))
+		qp.setBrush(brush)
+		if self.vertical == True:
+			qp.drawEllipse(self.points[0][0]+15, self.points[0][1]+12, 30, 80)
+		else:
+			qp.drawEllipse(self.points[0][0]+12, self.points[0][1]+15, 80, 30)
+		qp.end()
+
+class threeShip(QtWidgets.QWidget):
+
+class =fourShip(QtWidgets.QWidget):
+
+"""
+
 class startNewGameBtn(QtWidgets.QPushButton):
 	def __init__(self, parent):
 		QtWidgets.QPushButton.__init__(self, parent)
@@ -271,10 +325,10 @@ class quitMessage(QtWidgets.QMessageBox):
         self.addButton(self.Yes)      
 
 class winMessage(QtWidgets.QMessageBox):
-    def __init__(self):
-        QtWidgets.QMessageBox.__init__(self)
-        self.setText("Congrats")
-        self.addButton(self.Ok) 
+	def __init__(self):
+		QtWidgets.QMessageBox.__init__(self)
+		self.setText("Congrats")
+		self.addButton(self.Ok) 
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
