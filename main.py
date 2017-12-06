@@ -2,13 +2,31 @@
 NeoBattleship main.py
 
 """
-import sys, pickle
+import sys, random
 from PyQt5 import QtWidgets, QtCore, QtGui
 
 NBS_HEIGHT = 800/2
 NBS_WIDTH = 800/2
+#[x1,y1,x2,y2,length]
+SHIPS = [[[4,0,4,3,4],[0,1,2,1,3],[0,3,1,3,2]], [[1,2,4,2,4],[0,4,0,6,3],[4,7,5,7,2]], [[2,0,5,0,4],[6,4,6,6,3],[0,7,0,8,2]], [[8,0,8,3,4],[5,6,7,6,3],[3,2,4,2,2]], [[7,1,7,4,4],[2,2,2,4,3],[4,8,5,8,2]]]
 
 class gameWindow(QtWidgets.QMainWindow):
+<<<<<<< HEAD
+	def __init__(self):
+		QtWidgets.QWidget.__init__(self)
+		self.setWindowTitle("NeoBattleship")
+		
+		exit_action = QtWidgets.QAction("Exit", self)
+		exit_action.triggered.connect(QtWidgets.qApp.quit)
+		restart_action = QtWidgets.QAction("Restart", self)
+		restart_action.triggered.connect(self.setup)
+		menu_bar = self.menuBar()
+		menu_bar.setNativeMenuBar(False)
+		file_menu = menu_bar.addMenu("Options")
+		file_menu.addAction(exit_action) 
+		file_menu.addAction(restart_action) 
+		self.setup()
+=======
     def __init__(self):
         QtWidgets.QWidget.__init__(self)
         self.setup()
@@ -30,9 +48,26 @@ class gameWindow(QtWidgets.QMainWindow):
         file_menu = menu_bar.addMenu("Options")
         file_menu.addAction(exit_action)
         file_menu.addAction(start_game)      
+<<<<<<< HEAD
+>>>>>>> e2765499a89a7160e2499580488234057fe80183
+
+	def setup(self):		
+		self.game_grid = gameGrid(self)
+		self.setCentralWidget(self.game_grid)        
+		self.show()
+=======
 
         self.show()
+>>>>>>> e2765499a89a7160e2499580488234057fe80183
         
+<<<<<<< HEAD
+	def closeEvent(self, event):
+		reply = quitMessage().exec_()
+		if (reply == QtWidgets.QMessageBox.Yes):
+			event.accept()
+		else:
+			event.ignore()
+=======
     def closeEvent(self, event):
         reply = quitMessage().exec_()
         if (reply == QtWidgets.QMessageBox.Yes):
@@ -46,6 +81,10 @@ class gameWindow(QtWidgets.QMainWindow):
             event.accept()#Does nothing for now
         else:
             event.ignore()#Does nothing for now
+<<<<<<< HEAD
+>>>>>>> e2765499a89a7160e2499580488234057fe80183
+=======
+>>>>>>> e2765499a89a7160e2499580488234057fe80183
             
 class gameGrid(QtWidgets.QWidget):
 	def __init__(self, parent):
@@ -54,11 +93,21 @@ class gameGrid(QtWidgets.QWidget):
 		p.setColor(self.backgroundRole(), QtGui.QColor(150,150,150,255))
 		self.setPalette(p)
 		self.setAutoFillBackground(True)
+		self.parent = parent
 		self.setup()
 
 	def setup(self):
 		self.board = Player(self)
 		self.enemyBoard = Computer(self)
+<<<<<<< HEAD
+<<<<<<< HEAD
+		self.grid = QtWidgets.QGridLayout()
+		self.setLayout(self.grid)
+		self.grid.addWidget(self.enemyBoard, 0,0,1,1)
+		self.grid.addWidget(self.board, 1,0,1,1)         
+=======
+=======
+>>>>>>> e2765499a89a7160e2499580488234057fe80183
 		#self.new_btn = startNewGameBtn(self)
 		#self.quit_btn = quitBtn(self)
 		self.grid = QtWidgets.QGridLayout()
@@ -67,6 +116,10 @@ class gameGrid(QtWidgets.QWidget):
 		self.grid.addWidget(self.board, 1,0,1,1)		
 		#self.grid.addWidget(self.new_btn, 2, 0, 1, 1)
 		#self.grid.addWidget(self.quit_btn, 3, 0, 1, 1)           
+<<<<<<< HEAD
+>>>>>>> e2765499a89a7160e2499580488234057fe80183
+=======
+>>>>>>> e2765499a89a7160e2499580488234057fe80183
 
 class Player(QtWidgets.QWidget):
 	def __init__(self, parent):
@@ -80,12 +133,14 @@ class Player(QtWidgets.QWidget):
 		self.grid = QtWidgets.QGridLayout()
 		self.setLayout(self.grid)
 		self.grid.setSpacing(0)
-		self.holes = []		
-		self.place_holes()
-		#self.twoship = twoShip(self, [1,0], [2,0])
-		#self.threeship = threeShip(self, [0,1], [2,1])
-		#self.fourship = fourShip(self, [0,2], [3,2])
-		#self.place_ships()
+		self.parent = parent
+		self.ships = random.choice(SHIPS)
+		self.holes = []	
+		self.status = []	
+		self.positions = []
+		self.place_holes()		
+		self.placeShips()
+		self.setPositions()
 
 	def paintEvent(self, event):
 		qp = QtGui.QPainter()
@@ -111,10 +166,53 @@ class Player(QtWidgets.QWidget):
 				temp.append(hole)
 			self.holes.append(temp[:])
 
-	def place_ships(self):
-		for row in range(9):
-			for col in range(9):
-				self.holes[row][col].placement = False
+	def placeShips(self):
+		for ship in self.ships:
+			temp = []
+			if ship[0] == ship[2]:			
+				for i in range(ship[4]):	
+					self.holes[ship[0]][ship[1]+i].isShip()
+					temp.append(self.holes[ship[0]][ship[1]+i])
+			else:
+				for i in range(ship[4]):	
+					self.holes[ship[0]+i][ship[1]].isShip()
+					temp.append(self.holes[ship[0]+i][ship[1]])
+			temp2 = [temp[:],False]
+			self.status.append(temp2)
+
+	def setPositions(self):
+		clist = []
+		for ship in self.ships:
+			if ship[0] == ship[2]:			
+				for i in range(ship[4]):	
+					clist.append([ship[0],i])
+			else:
+				for i in range(ship[4]):
+					clist.append([i,ship[1]])
+		self.positions = clist[:]
+
+	def check(self):
+		for i in self.status:
+			if i[1] == False:
+				temp = True			
+				for e in i[0]:
+					if e.hit == False:
+						temp = False
+				i[1] = temp
+				if i[1] == True:
+					for j in i[0]:
+						j.sunken()
+
+		end = True
+		for i in self.status:
+			if i[1] == False:
+				end = False
+		if end == True:
+			reply = loseMessage().exec_()
+			if reply == QtWidgets.QMessageBox.Yes:
+				self.parent.parent.setup()
+			elif reply == QtWidgets.QMessageBox.No:
+				quit()
 
 class Computer(QtWidgets.QWidget):
 	def __init__(self, parent):
@@ -128,14 +226,16 @@ class Computer(QtWidgets.QWidget):
 		self.grid = QtWidgets.QGridLayout()
 		self.setLayout(self.grid)
 		self.grid.setSpacing(0)
+		self.choices = []
+		self.createChoices()
 		self.holes = []		
 		self.place_holes()
-		#possible function to get ships placements
-		#[x1,y1,x2,y2,length]
-		self.ships = [[4,0,4,3,4],[0,1,2,1,3],[0,2,1,2,2]]
+		self.ships = random.choice(SHIPS)
+		self.status = []
 		self.positions = []
 		self.placeShips()
-		self.setPositions()
+		self.parent = parent
+		self.turn = False
 
 	def paintEvent(self, event):
 		qp = QtGui.QPainter()
@@ -162,29 +262,51 @@ class Computer(QtWidgets.QWidget):
 
 	def placeShips(self):
 		for ship in self.ships:
+			temp = []
 			if ship[0] == ship[2]:			
 				for i in range(ship[4]):	
-					self.holes[ship[0]][i].isShip()
+					self.holes[ship[0]][ship[1]+i].isShip()
+					temp.append(self.holes[ship[0]][ship[1]+i])
 			else:
 				for i in range(ship[4]):	
-					self.holes[i][ship[1]].isShip()
+					self.holes[ship[0]+i][ship[1]].isShip()
+					temp.append(self.holes[ship[0]+i][ship[1]])
+			temp2 = [temp[:],False]
+			self.status.append(temp2)
 
-	def setPositions(self):
-		clist = []
-		for ship in self.ships:
-			if ship[0] == ship[2]:			
-				for i in range(ship[4]):	
-					clist.append([ship[0],i])
-			else:
-				for i in range(ship[4]):
-					clist.append([i,ship[1]])
-		self.positions = clist[:]
+	def check(self):
+		for i in self.status:
+			if i[1] == False:
+				temp = True			
+				for e in i[0]:
+					if e.hit == False:
+						temp = False
+				i[1] = temp
+				if i[1] == True:
+					for j in i[0]:
+						j.sunken()
 
-	def checkPositions(self):
-		if len(self.positions) == 0:
+		end = True
+		for i in self.status:
+			if i[1] == False:
+				end = False
+		if end == True:
 			reply = winMessage().exec_()
-			if (reply == QtWidgets.QMessageBox.Ok):
+			if reply == QtWidgets.QMessageBox.Yes:
+				self.parent.parent.setup()
+			elif reply == QtWidgets.QMessageBox.No:
 				quit()
+
+	def move(self):
+		choice = random.choice(self.choices)
+		self.choices.remove(choice)
+		self.parent.board.holes[choice[0]][choice[1]].addPeg()
+		self.turn = False
+		
+	def createChoices(self):
+		for i in range(9):
+			for e in range(9):
+				self.choices.append([i,e])
 				
 class computerHole(QtWidgets.QWidget):
 	def __init__(self, parent, e, i):
@@ -221,31 +343,41 @@ class computerHole(QtWidgets.QWidget):
 			qp.end()
 
 	def mousePressEvent(self, event):
-		if self.peg == False:
+		if self.peg == False and self.parent.turn == False:
 			if self.ship == True:
 				self.peg = True
 				self.hit = True
 				self.update()
-				self.parent.positions.remove([self.x,self.y])
-				self.parent.checkPositions()
+				self.parent.check()
+				self.parent.turn = True
+				self.parent.move()
 			else:
 				self.peg = True
-				self.update()			
+				self.update()
+				self.parent.turn = True
+				self.parent.move()
 
 	def isShip(self):
 		self.ship = True
 		self.update()
 
+	def sunken(self):
+		p = self.palette()
+		p.setBrush(self.backgroundRole(), QtGui.QColor(255,0,0,255))
+		self.setPalette(p)
+		self.setAutoFillBackground(True)
+
 class playerHole(QtWidgets.QWidget):
 	def __init__(self, parent, e, i):
 		QtWidgets.QWidget.__init__(self,parent)
+		self.parent = parent
 		self.peg = False
 		self.ship = False
 		self.hit = False
 		self.circle = 10
-		self.placement = True
 		self.x = i
 		self.y = e
+		self.ship = False
 
 	def paintEvent(self, event):
 		if self.peg == True and self.hit == True:
@@ -271,49 +403,35 @@ class playerHole(QtWidgets.QWidget):
 			qp.end()
 
 	def addPeg(self):
-		self.peg = True
+		if self.ship == True:
+			self.peg = True
+			self.hit = True
+			self.update()
+			self.parent.check()
+			self.parent.parent.enemyBoard.turn = False
+		else:
+			self.peg = True
+			self.update()
+			self.parent.parent.enemyBoard.turn = False			
+	
+	def isShip(self):
+		self.ship = True
+		p = self.palette()
+		p.setBrush(self.backgroundRole(), QtGui.QColor(192,192,192,255))
+		self.setPalette(p)
+		self.setAutoFillBackground(True)
 		self.update()
 
-	def mousePressEvent(self, event):
-		if self.placement == True:
-			p = self.palette()
-			p.setColor(self.backgroundRole(), QtGui.QColor(192,192,192,255))
-			self.setPalette(p)
-			self.setAutoFillBackground(True)
-			self.placement = False
-
-"""class twoShip(QtWidgets.QWidget):
-	def __init__(self, parent, p1, p2):
-		QtWidgets.QWidget.__init__(self, parent)
-		self.resize(parent.size())
-		self.points = []
-		self.vertical = False
-		if p1[0] == p2[0]:
-			self.vertical = True	
-			for i in range(2):	
-				self.points.append([0,i])
-		else:
-			self.vertical = False
-			for i in range(2):
-				self.points.append([i,0])
-
-	def paintEvent(self, event):
-		qp = QtGui.QPainter()
-		qp.begin(self)
-		brush = QtGui.QBrush(QtGui.QColor(192,192,192,150))
-		qp.setBrush(brush)
-		if self.vertical == True:
-			qp.drawEllipse(self.points[0][0]+15, self.points[0][1]+12, 30, 80)
-		else:
-			qp.drawEllipse(self.points[0][0]+12, self.points[0][1]+15, 80, 30)
-		qp.end()
-
-class threeShip(QtWidgets.QWidget):
-
-class =fourShip(QtWidgets.QWidget):
-
-"""
-
+<<<<<<< HEAD
+<<<<<<< HEAD
+	def sunken(self):
+		p = self.palette()
+		p.setBrush(self.backgroundRole(), QtGui.QColor(255,0,0,255))
+		self.setPalette(p)
+        
+=======
+=======
+>>>>>>> e2765499a89a7160e2499580488234057fe80183
 """class startNewGameBtn(QtWidgets.QPushButton):
 	def __init__(self, parent):
 		QtWidgets.QPushButton.__init__(self, parent)
@@ -327,6 +445,10 @@ class quitBtn(QtWidgets.QPushButton):
 		self.setText("Quit")
 		self.setMaximumSize(100,100)
 """        
+<<<<<<< HEAD
+>>>>>>> e2765499a89a7160e2499580488234057fe80183
+=======
+>>>>>>> e2765499a89a7160e2499580488234057fe80183
 class quitMessage(QtWidgets.QMessageBox):
     def __init__(self):
         QtWidgets.QMessageBox.__init__(self)
@@ -344,8 +466,17 @@ class startNewGameMessage(QtWidgets.QMessageBox):
 class winMessage(QtWidgets.QMessageBox):
 	def __init__(self):
 		QtWidgets.QMessageBox.__init__(self)
-		self.setText("Congrats")
-		self.addButton(self.Ok) 
+		self.setText("Congrats, Would you like to play again?")
+		self.addButton(self.Yes)
+		self.addButton(self.No)
+
+class loseMessage(QtWidgets.QMessageBox):
+	def __init__(self):
+		QtWidgets.QMessageBox.__init__(self)
+		self.setText("You Lose, Would you like to play again?")
+		self.addButton(self.Yes)
+		self.addButton(self.No)
+
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
