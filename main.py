@@ -21,12 +21,15 @@ class gameWindow(QtWidgets.QMainWindow):
         
         exit_action = QtWidgets.QAction("Exit", self)
         exit_action.triggered.connect(QtWidgets.qApp.quit)
+        start_game = QtWidgets.QAction("Start New Game", self)
+        start_game.triggered.connect(self.startNewGame)
         
         
         menu_bar = self.menuBar()
         menu_bar.setNativeMenuBar(False)
         file_menu = menu_bar.addMenu("Options")
-        file_menu.addAction(exit_action)      
+        file_menu.addAction(exit_action)
+        file_menu.addAction(start_game)      
 
         self.show()
         
@@ -36,6 +39,13 @@ class gameWindow(QtWidgets.QMainWindow):
             event.accept()
         else:
             event.ignore()
+
+    def startNewGame(self, event):
+        reply = startNewGameMessage().exec_()
+        if (reply == QtWidgets.QMessageBox.Yes):
+            event.accept()#Does nothing for now
+        else:
+            event.ignore()#Does nothing for now
             
 class gameGrid(QtWidgets.QWidget):
 	def __init__(self, parent):
@@ -49,14 +59,14 @@ class gameGrid(QtWidgets.QWidget):
 	def setup(self):
 		self.board = Player(self)
 		self.enemyBoard = Computer(self)
-		self.new_btn = startNewGameBtn(self)
-		self.quit_btn = quitBtn(self)
+		#self.new_btn = startNewGameBtn(self)
+		#self.quit_btn = quitBtn(self)
 		self.grid = QtWidgets.QGridLayout()
 		self.setLayout(self.grid)
 		self.grid.addWidget(self.enemyBoard, 0,0,1,1)
 		self.grid.addWidget(self.board, 1,0,1,1)		
-		self.grid.addWidget(self.new_btn, 2, 0, 1, 1)
-		self.grid.addWidget(self.quit_btn, 3, 0, 1, 1)           
+		#self.grid.addWidget(self.new_btn, 2, 0, 1, 1)
+		#self.grid.addWidget(self.quit_btn, 3, 0, 1, 1)           
 
 class Player(QtWidgets.QWidget):
 	def __init__(self, parent):
@@ -304,7 +314,7 @@ class =fourShip(QtWidgets.QWidget):
 
 """
 
-class startNewGameBtn(QtWidgets.QPushButton):
+"""class startNewGameBtn(QtWidgets.QPushButton):
 	def __init__(self, parent):
 		QtWidgets.QPushButton.__init__(self, parent)
 		self.setText("Start New Game")
@@ -316,13 +326,20 @@ class quitBtn(QtWidgets.QPushButton):
 		self.clicked.connect(QtWidgets.qApp.quit)
 		self.setText("Quit")
 		self.setMaximumSize(100,100)
-        
+"""        
 class quitMessage(QtWidgets.QMessageBox):
     def __init__(self):
         QtWidgets.QMessageBox.__init__(self)
         self.setText("Are you sure you'd like to quit?")
         self.addButton(self.No)  
-        self.addButton(self.Yes)      
+        self.addButton(self.Yes)   
+
+class startNewGameMessage(QtWidgets.QMessageBox):
+    def __init__(self):
+        QtWidgets.QMessageBox.__init__(self)
+        self.setText("Are you sure you'd like to start a new game?")
+        self.addButton(self.No)  
+        self.addButton(self.Yes)    
 
 class winMessage(QtWidgets.QMessageBox):
 	def __init__(self):
