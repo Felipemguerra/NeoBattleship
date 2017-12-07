@@ -5,8 +5,6 @@ NeoBattleship main.py
 import sys, random
 from PyQt5 import QtWidgets, QtCore, QtGui
 
-NBS_HEIGHT = 800/2
-NBS_WIDTH = 800/2
 #[x1,y1,x2,y2,length]
 SHIPS = [[[4,0,4,3,4],[0,1,2,1,3],[0,3,1,3,2]], [[1,2,4,2,4],[0,4,0,6,3],[4,7,5,7,2]], [[2,0,5,0,4],[6,4,6,6,3],[0,7,0,8,2]], [[8,0,8,3,4],[5,6,7,6,3],[3,2,4,2,2]], [[7,1,7,4,4],[2,2,2,4,3],[4,8,5,8,2]]]
 
@@ -14,7 +12,7 @@ class gameWindow(QtWidgets.QMainWindow):
 	def __init__(self):
 		QtWidgets.QWidget.__init__(self)
 		self.setWindowTitle("NeoBattleship")
-		
+		#set up menu bar with options
 		exit_action = QtWidgets.QAction("Exit", self)
 		exit_action.triggered.connect(QtWidgets.qApp.quit)
 		restart_action = QtWidgets.QAction("Restart", self)
@@ -41,66 +39,75 @@ class gameWindow(QtWidgets.QMainWindow):
 class gameGrid(QtWidgets.QWidget):
 	def __init__(self, parent):
 		QtWidgets.QWidget.__init__(self)
+		#set background color
 		p = self.palette()
-		p.setColor(self.backgroundRole(), QtGui.QColor(150,150,150,255))
+		p.setColor(self.backgroundRole(), QtGui.QColor(120,120,120,255))
 		self.setPalette(p)
 		self.setAutoFillBackground(True)
-		self.parent = parent
 		self.setup()
+		#store parent needed for restart mid-game
+		self.parent = parent
 
 	def setup(self):
-		self.board = Player(self)
-		self.enemyBoard = Computer(self)
+		self.player = Player(self)
+		self.enemy = Computer(self)
 		self.grid = QtWidgets.QGridLayout()
 		self.setLayout(self.grid)
-		self.grid.addWidget(self.enemyBoard, 0,0,1,1)
-		self.grid.addWidget(self.board, 1,0,1,1)         
+		self.grid.addWidget(self.enemy, 0,0,1,1)
+		self.grid.addWidget(self.player, 0,1,1,1)         
 
 class Player(QtWidgets.QWidget):
 	def __init__(self, parent):
 		QtWidgets.QWidget.__init__(self, parent)
-		self.setFixedSize(NBS_WIDTH, NBS_HEIGHT)
+		#set the size of board
+		self.setFixedSize(APP_WIDTH, APP_HEIGHT)
+		#set background as water imaqe
 		b = QtGui.QBrush(QtGui.QImage('water.bmp'))
 		p = self.palette()
 		p.setBrush(self.backgroundRole(), b)
 		self.setPalette(p)
 		self.setAutoFillBackground(True)
+		#create grid layout and populate with hole widgets
 		self.grid = QtWidgets.QGridLayout()
 		self.setLayout(self.grid)
 		self.grid.setSpacing(0)
-		self.parent = parent
+		self.holes = []
+		self.place_holes()
+		#choose random ship mapping and place ships
+		#room for improvement
 		self.ships = random.choice(SHIPS)
-		self.holes = []	
 		self.status = []	
-		self.positions = []
-		self.place_holes()		
 		self.placeShips()
-		self.setPositions()
+		#store parent
+		self.parent = parent
 
+	#draw grid
 	def paintEvent(self, event):
 		qp = QtGui.QPainter()
 		qp.begin(self)
 		pen = qp.pen()
 		pen.setColor(QtGui.QColor(255,255,255,255))
 		qp.setPen(pen)
-		j = 10
-		dev = 10
-		for i in range(j):
-			qp.drawLine(QtCore.QLineF((NBS_WIDTH/j)*i+dev, 10, (NBS_WIDTH/j)*i+dev, NBS_HEIGHT-12))
-			qp.drawLine(QtCore.QLineF(10, (NBS_WIDTH/j)*i+dev, NBS_HEIGHT-12, (NBS_WIDTH/j)*i+dev))
-			dev +=2
-			
+		for i in range(9):		
+			qp.drawLine(QtCore.QLine(self.holes[i][0].x(), self.holes[i][0].y(), self.holes[i][8].x(), self.holes[i][8].y() + self.holes[i][8].height()))
+			qp.drawLine(QtCore.QLine(self.holes[0][i].x(), self.holes[0][i].y(), self.holes[8][i].x() + self.holes[8][i].width(), self.holes[8][i].y()))
+
+		qp.drawLine(QtCore.QLine(self.holes[8][0].x() + self.holes[8][0].width(), self.holes[8][0].y(),self.holes[8][0].x() + self.holes[8][0].width(), self.holes[8][8].y() + self.holes[i][8].height()))
+		qp.drawLine(QtCore.QLine(self.holes[0][8].x(), self.holes[0][8].y() + self.holes[0][8].height(), self.holes[8][8].x() + self.holes[8][8].width(), self.holes[8][8].y() + self.holes[8][8].height()))
 		qp.end()
 
+	#populate grid layout with widgets
 	def place_holes(self):
-		for col in range(9):
+		for row in range(9):
 			temp = []
-			for row in range(9):
-				hole = playerHole(self, row, col)
-				self.grid.addWidget(hole, row, col)
+			for col in range(9):
+				hole = playerHole(self)
+				self.grid.addWidget(hole, col, row)
 				temp.append(hole)
 			self.holes.append(temp[:])
 
+	#use random ship layout and mark necessary
+	#widgets
 	def placeShips(self):
 		for ship in self.ships:
 			temp = []
@@ -115,17 +122,10 @@ class Player(QtWidgets.QWidget):
 			temp2 = [temp[:],False]
 			self.status.append(temp2)
 
-	def setPositions(self):
-		clist = []
-		for ship in self.ships:
-			if ship[0] == ship[2]:			
-				for i in range(ship[4]):	
-					clist.append([ship[0],i])
-			else:
-				for i in range(ship[4]):
-					clist.append([i,ship[1]])
-		self.positions = clist[:]
-
+	#Called after computer turn
+	#checks ships and marks and sunken if necessary
+	#check if computer has won
+	#call lose message if necessary
 	def check(self):
 		for i in self.status:
 			if i[1] == False:
@@ -137,7 +137,6 @@ class Player(QtWidgets.QWidget):
 				if i[1] == True:
 					for j in i[0]:
 						j.sunken()
-
 		end = True
 		for i in self.status:
 			if i[1] == False:
@@ -152,49 +151,58 @@ class Player(QtWidgets.QWidget):
 class Computer(QtWidgets.QWidget):
 	def __init__(self, parent):
 		QtWidgets.QWidget.__init__(self, parent)
-		self.setFixedSize(NBS_WIDTH, NBS_HEIGHT)
+		#set the size of board
+		self.setFixedSize(APP_WIDTH, APP_HEIGHT)
+		#set background as water imaqe
 		b = QtGui.QBrush(QtGui.QImage('water.bmp'))
 		p = self.palette()
 		p.setBrush(self.backgroundRole(), b)
 		self.setPalette(p)
 		self.setAutoFillBackground(True)
+		#create grid layout and populate with hole widgets
 		self.grid = QtWidgets.QGridLayout()
 		self.setLayout(self.grid)
 		self.grid.setSpacing(0)
+		self.holes = []	
+		self.place_holes()
+		#create grid in order to keep track of computer moves
 		self.choices = []
 		self.createChoices()
-		self.holes = []		
-		self.place_holes()
+		#choose random ship mapping	and place ships
+		#room for improvement
 		self.ships = random.choice(SHIPS)
 		self.status = []
-		self.positions = []
 		self.placeShips()
+		#store parent and turn tracker
 		self.parent = parent
 		self.turn = False
 
+	#draw grid
 	def paintEvent(self, event):
 		qp = QtGui.QPainter()
 		qp.begin(self)
 		pen = qp.pen()
 		pen.setColor(QtGui.QColor(255,255,255,255))
 		qp.setPen(pen)
-		j = 10
-		dev = 10
-		for i in range(j):
-			qp.drawLine(QtCore.QLineF((NBS_WIDTH/j)*i+dev, 10, (NBS_WIDTH/j)*i+dev, NBS_HEIGHT-12))
-			qp.drawLine(QtCore.QLineF(10, (NBS_WIDTH/j)*i+dev, NBS_HEIGHT-12, (NBS_WIDTH/j)*i+dev))
-			dev +=2
+		for i in range(9):		
+			qp.drawLine(QtCore.QLine(self.holes[i][0].x(), self.holes[i][0].y(), self.holes[i][8].x(), self.holes[i][8].y() + self.holes[i][8].height()))
+			qp.drawLine(QtCore.QLine(self.holes[0][i].x(), self.holes[0][i].y(), self.holes[8][i].x() + self.holes[8][i].width(), self.holes[8][i].y()))
+
+		qp.drawLine(QtCore.QLine(self.holes[8][0].x() + self.holes[8][0].width(), self.holes[8][0].y(),self.holes[8][0].x() + self.holes[8][0].width(), self.holes[8][8].y() + self.holes[i][8].height()))
+		qp.drawLine(QtCore.QLine(self.holes[0][8].x(), self.holes[0][8].y() + self.holes[0][8].height(), self.holes[8][8].x() + self.holes[8][8].width(), self.holes[8][8].y() + self.holes[8][8].height()))
 		qp.end()
 
+	#populate grid layout with widgets
 	def place_holes(self):
-		for col in range(9):
+		for row in range(9):
 			temp = []
-			for row in range(9):
-				hole = computerHole(self, row, col)
-				self.grid.addWidget(hole, row, col)
+			for col in range(9):
+				hole = computerHole(self)
+				self.grid.addWidget(hole, col, row)
 				temp.append(hole)
 			self.holes.append(temp[:])
 
+	#use random ship layout and mark necessary widgets
 	def placeShips(self):
 		for ship in self.ships:
 			temp = []
@@ -209,6 +217,10 @@ class Computer(QtWidgets.QWidget):
 			temp2 = [temp[:],False]
 			self.status.append(temp2)
 
+	#Called after player turn
+	#checks ships and marks and sunken if necessary
+	#check if player has won
+	#call win message if necessary
 	def check(self):
 		for i in self.status:
 			if i[1] == False:
@@ -220,7 +232,6 @@ class Computer(QtWidgets.QWidget):
 				if i[1] == True:
 					for j in i[0]:
 						j.sunken()
-
 		end = True
 		for i in self.status:
 			if i[1] == False:
@@ -232,10 +243,12 @@ class Computer(QtWidgets.QWidget):
 			elif reply == QtWidgets.QMessageBox.No:
 				quit()
 
+	#simple function that makes random computer move
+	#room for improvement
 	def move(self):
 		choice = random.choice(self.choices)
 		self.choices.remove(choice)
-		self.parent.board.holes[choice[0]][choice[1]].addPeg()
+		self.parent.player.holes[choice[0]][choice[1]].addPeg()
 		self.turn = False
 		
 	def createChoices(self):
@@ -244,39 +257,46 @@ class Computer(QtWidgets.QWidget):
 				self.choices.append([i,e])
 				
 class computerHole(QtWidgets.QWidget):
-	def __init__(self, parent, e, i):
+	def __init__(self, parent):
 		QtWidgets.QWidget.__init__(self,parent)
+		#store important hole information
 		self.peg = False
 		self.ship = False
 		self.hit = False
-		self.circle = 10
-		self.x = i
-		self.y = e
 		self.parent = parent
-
+		#used to draw proportional circle for holes
+		self.circle = (APP_HEIGHT*2)/(self.width()/2)
+		
+	#draw hole depending on status of hole
+	#hit = red
+	#miss = green
+	#unvisited = white
 	def paintEvent(self, event):
 		if self.peg == True and self.ship == True:
 			qp = QtGui.QPainter()
 			qp.begin(self)
 			brush = QtGui.QBrush(QtGui.QColor(255,0,0,255))
 			qp.setBrush(brush)
-			qp.drawEllipse(self.circle,self.circle,20,20)
+			qp.drawEllipse((self.width()-self.circle)/2,(self.height()-self.circle)/2,self.circle,self.circle)
 			qp.end()
 		elif self.peg == True and self.ship == False:
 			qp = QtGui.QPainter()
 			qp.begin(self)
 			brush = QtGui.QBrush(QtGui.QColor(0,255,0,255))
 			qp.setBrush(brush)
-			qp.drawEllipse(self.circle,self.circle,20,20)
+			qp.drawEllipse((self.width()-self.circle)/2,(self.height()-self.circle)/2,self.circle,self.circle)
 			qp.end()
 		else:
 			qp = QtGui.QPainter()
 			qp.begin(self)
 			brush = QtGui.QBrush(QtGui.QColor(255,255,255,255))
 			qp.setBrush(brush)
-			qp.drawEllipse(self.circle,self.circle,20,20)
+			qp.drawEllipse((self.width()-self.circle)/2,(self.height()-self.circle)/2,self.circle,self.circle)
 			qp.end()
 
+	#reads in players hole choice
+	#makes necessary checks and updates
+	#then switches to computer turn
 	def mousePressEvent(self, event):
 		if self.peg == False and self.parent.turn == False:
 			if self.ship == True:
@@ -292,10 +312,12 @@ class computerHole(QtWidgets.QWidget):
 				self.parent.turn = True
 				self.parent.move()
 
+	#Used by parent function to keep track of ship widgets
 	def isShip(self):
 		self.ship = True
 		self.update()
 
+	#color ship red when it sinks
 	def sunken(self):
 		p = self.palette()
 		p.setBrush(self.backgroundRole(), QtGui.QColor(255,0,0,255))
@@ -303,52 +325,60 @@ class computerHole(QtWidgets.QWidget):
 		self.setAutoFillBackground(True)
 
 class playerHole(QtWidgets.QWidget):
-	def __init__(self, parent, e, i):
+	def __init__(self, parent):
 		QtWidgets.QWidget.__init__(self,parent)
+		#store important hole information
 		self.parent = parent
 		self.peg = False
 		self.ship = False
 		self.hit = False
-		self.circle = 10
-		self.x = i
-		self.y = e
-		self.ship = False
+		#used to draw proportional circle for holes
+		self.circle = (APP_HEIGHT*2)/(self.width()/2)
 
+	#draw hole depending on status of hole
+	#hit = red
+	#miss = green
+	#unvisited = white
 	def paintEvent(self, event):
 		if self.peg == True and self.hit == True:
 			qp = QtGui.QPainter()
 			qp.begin(self)
 			brush = QtGui.QBrush(QtGui.QColor(255,0,0,255))
 			qp.setBrush(brush)
-			qp.drawEllipse(self.circle,self.circle,20,20)
+			qp.drawEllipse((self.width()-self.circle)/2,(self.height()-self.circle)/2,self.circle,self.circle)
 			qp.end()
 		elif self.peg == True and self.hit == False:
 			qp = QtGui.QPainter()
 			qp.begin(self)
 			brush = QtGui.QBrush(QtGui.QColor(0,255,0,255))
 			qp.setBrush(brush)
-			qp.drawEllipse(self.circle,self.circle,20,20)
+			qp.drawEllipse((self.width()-self.circle)/2,(self.height()-self.circle)/2,self.circle,self.circle)
 			qp.end()
 		else:
 			qp = QtGui.QPainter()
 			qp.begin(self)
 			brush = QtGui.QBrush(QtGui.QColor(255,255,255,255))
 			qp.setBrush(brush)
-			qp.drawEllipse(self.circle,self.circle,20,20)
+			qp.drawEllipse((self.width()-self.circle)/2,(self.height()-self.circle)/2,self.circle,self.circle)
 			qp.end()
 
+	#called by computer whenit makes a move
+	#makes necessary checks and updates
+	#then switches to player turn
 	def addPeg(self):
 		if self.ship == True:
 			self.peg = True
 			self.hit = True
 			self.update()
 			self.parent.check()
-			self.parent.parent.enemyBoard.turn = False
+			self.parent.parent.enemy.turn = False
 		else:
 			self.peg = True
 			self.update()
-			self.parent.parent.enemyBoard.turn = False			
+			self.parent.parent.enemy.turn = False			
 	
+	#Used by parent function to keep track of ship widgets
+	#makes player ships visible
 	def isShip(self):
 		self.ship = True
 		p = self.palette()
@@ -357,11 +387,12 @@ class playerHole(QtWidgets.QWidget):
 		self.setAutoFillBackground(True)
 		self.update()
 
+	#color ship red when it sinks
 	def sunken(self):
 		p = self.palette()
 		p.setBrush(self.backgroundRole(), QtGui.QColor(255,0,0,255))
 		self.setPalette(p)
-        
+
 class quitMessage(QtWidgets.QMessageBox):
     def __init__(self):
         QtWidgets.QMessageBox.__init__(self)
@@ -383,8 +414,10 @@ class loseMessage(QtWidgets.QMessageBox):
 		self.addButton(self.Yes)
 		self.addButton(self.No)
 
-
 if __name__ == "__main__":
-    app = QtWidgets.QApplication(sys.argv)
-    main_window = gameWindow()
-    app.exec_()
+		app = QtWidgets.QApplication(sys.argv)
+		size =  app.desktop().screenGeometry()
+		APP_HEIGHT = size.width()/3
+		APP_WIDTH = size.width()/3
+		main_window = gameWindow()
+		app.exec_()
