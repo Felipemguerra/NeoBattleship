@@ -40,8 +40,9 @@ class gameGrid(QtWidgets.QWidget):
 	def __init__(self, parent):
 		QtWidgets.QWidget.__init__(self)
 		#set background color
+		b = QtGui.QBrush(QtGui.QImage('metal.jpg'))
 		p = self.palette()
-		p.setColor(self.backgroundRole(), QtGui.QColor(120,120,120,255))
+		p.setBrush(self.backgroundRole(), b)
 		self.setPalette(p)
 		self.setAutoFillBackground(True)
 		self.setup()
@@ -263,6 +264,7 @@ class computerHole(QtWidgets.QWidget):
 		self.peg = False
 		self.ship = False
 		self.hit = False
+		self.sunk = False
 		self.parent = parent
 		#used to draw proportional circle for holes
 		self.circle = (APP_HEIGHT*2)/(self.width()/2)
@@ -272,24 +274,21 @@ class computerHole(QtWidgets.QWidget):
 	#miss = green
 	#unvisited = white
 	def paintEvent(self, event):
-		if self.peg == True and self.ship == True:
+		if self.peg == True and self.ship == True and self.sunk == False:
 			qp = QtGui.QPainter()
 			qp.begin(self)
-			brush = QtGui.QBrush(QtGui.QColor(255,0,0,255))
+			brush = QtGui.QBrush(QtGui.QImage('explosion.jpg'))
 			qp.setBrush(brush)
 			qp.drawEllipse((self.width()-self.circle)/2,(self.height()-self.circle)/2,self.circle,self.circle)
 			qp.end()
+		elif self.peg == True and self.hit == True and self.sunk == True:
+			None
 		elif self.peg == True and self.ship == False:
-			qp = QtGui.QPainter()
-			qp.begin(self)
-			brush = QtGui.QBrush(QtGui.QColor(0,255,0,255))
-			qp.setBrush(brush)
-			qp.drawEllipse((self.width()-self.circle)/2,(self.height()-self.circle)/2,self.circle,self.circle)
-			qp.end()
+			None
 		else:
 			qp = QtGui.QPainter()
 			qp.begin(self)
-			brush = QtGui.QBrush(QtGui.QColor(255,255,255,255))
+			brush = QtGui.QBrush(QtGui.QColor(0,0,0,255))
 			qp.setBrush(brush)
 			qp.drawEllipse((self.width()-self.circle)/2,(self.height()-self.circle)/2,self.circle,self.circle)
 			qp.end()
@@ -319,8 +318,10 @@ class computerHole(QtWidgets.QWidget):
 
 	#color ship red when it sinks
 	def sunken(self):
+		self.sunk = True
+		b = QtGui.QBrush(QtGui.QImage('explosion.jpg'))
 		p = self.palette()
-		p.setBrush(self.backgroundRole(), QtGui.QColor(255,0,0,255))
+		p.setBrush(self.backgroundRole(), b)
 		self.setPalette(p)
 		self.setAutoFillBackground(True)
 
@@ -332,6 +333,7 @@ class playerHole(QtWidgets.QWidget):
 		self.peg = False
 		self.ship = False
 		self.hit = False
+		self.sunk = False
 		#used to draw proportional circle for holes
 		self.circle = (APP_HEIGHT*2)/(self.width()/2)
 
@@ -340,24 +342,21 @@ class playerHole(QtWidgets.QWidget):
 	#miss = green
 	#unvisited = white
 	def paintEvent(self, event):
-		if self.peg == True and self.hit == True:
+		if self.peg == True and self.hit == True and self.sunk == False:
 			qp = QtGui.QPainter()
 			qp.begin(self)
-			brush = QtGui.QBrush(QtGui.QColor(255,0,0,255))
+			brush = QtGui.QBrush(QtGui.QImage('explosion.jpg'))
 			qp.setBrush(brush)
 			qp.drawEllipse((self.width()-self.circle)/2,(self.height()-self.circle)/2,self.circle,self.circle)
 			qp.end()
+		elif self.peg == True and self.hit == True and self.sunk == True:
+			None
 		elif self.peg == True and self.hit == False:
-			qp = QtGui.QPainter()
-			qp.begin(self)
-			brush = QtGui.QBrush(QtGui.QColor(0,255,0,255))
-			qp.setBrush(brush)
-			qp.drawEllipse((self.width()-self.circle)/2,(self.height()-self.circle)/2,self.circle,self.circle)
-			qp.end()
+			None
 		else:
 			qp = QtGui.QPainter()
 			qp.begin(self)
-			brush = QtGui.QBrush(QtGui.QColor(255,255,255,255))
+			brush = QtGui.QBrush(QtGui.QColor(0,0,0,255))
 			qp.setBrush(brush)
 			qp.drawEllipse((self.width()-self.circle)/2,(self.height()-self.circle)/2,self.circle,self.circle)
 			qp.end()
@@ -381,16 +380,19 @@ class playerHole(QtWidgets.QWidget):
 	#makes player ships visible
 	def isShip(self):
 		self.ship = True
+		b = QtGui.QBrush(QtGui.QImage('ship.jpg'))
 		p = self.palette()
-		p.setBrush(self.backgroundRole(), QtGui.QColor(192,192,192,255))
+		p.setBrush(self.backgroundRole(), b)
 		self.setPalette(p)
 		self.setAutoFillBackground(True)
 		self.update()
 
 	#color ship red when it sinks
 	def sunken(self):
+		self.sunk = True
+		b = QtGui.QBrush(QtGui.QImage('explosion.jpg'))
 		p = self.palette()
-		p.setBrush(self.backgroundRole(), QtGui.QColor(255,0,0,255))
+		p.setBrush(self.backgroundRole(), b)
 		self.setPalette(p)
 
 class quitMessage(QtWidgets.QMessageBox):
@@ -403,14 +405,16 @@ class quitMessage(QtWidgets.QMessageBox):
 class winMessage(QtWidgets.QMessageBox):
 	def __init__(self):
 		QtWidgets.QMessageBox.__init__(self)
-		self.setText("Congrats, Would you like to play again?")
+		self.setWindowTitle("Congrats")
+		self.setText("Would you like to play again?")
 		self.addButton(self.Yes)
 		self.addButton(self.No)
 
 class loseMessage(QtWidgets.QMessageBox):
 	def __init__(self):
 		QtWidgets.QMessageBox.__init__(self)
-		self.setText("You Lose, Would you like to play again?")
+		self.setWindowTitle("You Lose")
+		self.setText("Would you like to play again?")
 		self.addButton(self.Yes)
 		self.addButton(self.No)
 
