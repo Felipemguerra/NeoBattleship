@@ -11,7 +11,6 @@ NBS_WIDTH = 800/2
 SHIPS = [[[4,0,4,3,4],[0,1,2,1,3],[0,3,1,3,2]], [[1,2,4,2,4],[0,4,0,6,3],[4,7,5,7,2]], [[2,0,5,0,4],[6,4,6,6,3],[0,7,0,8,2]], [[8,0,8,3,4],[5,6,7,6,3],[3,2,4,2,2]], [[7,1,7,4,4],[2,2,2,4,3],[4,8,5,8,2]]]
 
 class gameWindow(QtWidgets.QMainWindow):
-<<<<<<< HEAD
 	def __init__(self):
 		QtWidgets.QWidget.__init__(self)
 		self.setWindowTitle("NeoBattleship")
@@ -26,65 +25,18 @@ class gameWindow(QtWidgets.QMainWindow):
 		file_menu.addAction(exit_action) 
 		file_menu.addAction(restart_action) 
 		self.setup()
-=======
-    def __init__(self):
-        QtWidgets.QWidget.__init__(self)
-        self.setup()
-
-    def setup(self):
-        self.setWindowTitle("NeoBattleship - Naval Simulator")
-
-        self.game_grid = gameGrid(self)
-        self.setCentralWidget(self.game_grid)
-        
-        exit_action = QtWidgets.QAction("Exit", self)
-        exit_action.triggered.connect(QtWidgets.qApp.quit)
-        start_game = QtWidgets.QAction("Start New Game", self)
-        start_game.triggered.connect(self.startNewGame)
-        
-        
-        menu_bar = self.menuBar()
-        menu_bar.setNativeMenuBar(False)
-        file_menu = menu_bar.addMenu("Options")
-        file_menu.addAction(exit_action)
-        file_menu.addAction(start_game)      
-<<<<<<< HEAD
->>>>>>> e2765499a89a7160e2499580488234057fe80183
 
 	def setup(self):		
 		self.game_grid = gameGrid(self)
 		self.setCentralWidget(self.game_grid)        
 		self.show()
-=======
-
-        self.show()
->>>>>>> e2765499a89a7160e2499580488234057fe80183
         
-<<<<<<< HEAD
 	def closeEvent(self, event):
 		reply = quitMessage().exec_()
 		if (reply == QtWidgets.QMessageBox.Yes):
 			event.accept()
 		else:
 			event.ignore()
-=======
-    def closeEvent(self, event):
-        reply = quitMessage().exec_()
-        if (reply == QtWidgets.QMessageBox.Yes):
-            event.accept()
-        else:
-            event.ignore()
-
-    def startNewGame(self, event):
-        reply = startNewGameMessage().exec_()
-        if (reply == QtWidgets.QMessageBox.Yes):
-            event.accept()#Does nothing for now
-        else:
-            event.ignore()#Does nothing for now
-<<<<<<< HEAD
->>>>>>> e2765499a89a7160e2499580488234057fe80183
-=======
->>>>>>> e2765499a89a7160e2499580488234057fe80183
             
 class gameGrid(QtWidgets.QWidget):
 	def __init__(self, parent):
@@ -99,27 +51,10 @@ class gameGrid(QtWidgets.QWidget):
 	def setup(self):
 		self.board = Player(self)
 		self.enemyBoard = Computer(self)
-<<<<<<< HEAD
-<<<<<<< HEAD
 		self.grid = QtWidgets.QGridLayout()
 		self.setLayout(self.grid)
 		self.grid.addWidget(self.enemyBoard, 0,0,1,1)
 		self.grid.addWidget(self.board, 1,0,1,1)         
-=======
-=======
->>>>>>> e2765499a89a7160e2499580488234057fe80183
-		#self.new_btn = startNewGameBtn(self)
-		#self.quit_btn = quitBtn(self)
-		self.grid = QtWidgets.QGridLayout()
-		self.setLayout(self.grid)
-		self.grid.addWidget(self.enemyBoard, 0,0,1,1)
-		self.grid.addWidget(self.board, 1,0,1,1)		
-		#self.grid.addWidget(self.new_btn, 2, 0, 1, 1)
-		#self.grid.addWidget(self.quit_btn, 3, 0, 1, 1)           
-<<<<<<< HEAD
->>>>>>> e2765499a89a7160e2499580488234057fe80183
-=======
->>>>>>> e2765499a89a7160e2499580488234057fe80183
 
 class Player(QtWidgets.QWidget):
 	def __init__(self, parent):
@@ -422,46 +357,17 @@ class playerHole(QtWidgets.QWidget):
 		self.setAutoFillBackground(True)
 		self.update()
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 	def sunken(self):
 		p = self.palette()
 		p.setBrush(self.backgroundRole(), QtGui.QColor(255,0,0,255))
 		self.setPalette(p)
         
-=======
-=======
->>>>>>> e2765499a89a7160e2499580488234057fe80183
-"""class startNewGameBtn(QtWidgets.QPushButton):
-	def __init__(self, parent):
-		QtWidgets.QPushButton.__init__(self, parent)
-		self.setText("Start New Game")
-		self.setMaximumSize(150,100)
-        
-class quitBtn(QtWidgets.QPushButton):
-	def __init__(self, parent):
-		QtWidgets.QPushButton.__init__(self, parent)
-		self.clicked.connect(QtWidgets.qApp.quit)
-		self.setText("Quit")
-		self.setMaximumSize(100,100)
-"""        
-<<<<<<< HEAD
->>>>>>> e2765499a89a7160e2499580488234057fe80183
-=======
->>>>>>> e2765499a89a7160e2499580488234057fe80183
 class quitMessage(QtWidgets.QMessageBox):
     def __init__(self):
         QtWidgets.QMessageBox.__init__(self)
         self.setText("Are you sure you'd like to quit?")
         self.addButton(self.No)  
-        self.addButton(self.Yes)   
-
-class startNewGameMessage(QtWidgets.QMessageBox):
-    def __init__(self):
-        QtWidgets.QMessageBox.__init__(self)
-        self.setText("Are you sure you'd like to start a new game?")
-        self.addButton(self.No)  
-        self.addButton(self.Yes)    
+        self.addButton(self.Yes)      
 
 class winMessage(QtWidgets.QMessageBox):
 	def __init__(self):
