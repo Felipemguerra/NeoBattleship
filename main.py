@@ -177,6 +177,9 @@ class Computer(QtWidgets.QWidget):
 		#store parent and turn tracker
 		self.parent = parent
 		self.turn = False
+		#self.hit = False
+		#self.vertical = True
+		#self.jump = 1
 
 	#draw grid
 	def paintEvent(self, event):
@@ -247,10 +250,173 @@ class Computer(QtWidgets.QWidget):
 	#simple function that makes random computer move
 	#room for improvement
 	def move(self):
+		#if self.hit == False:	
+		#self.vertical = True
 		choice = random.choice(self.choices)
 		self.choices.remove(choice)
-		self.parent.player.holes[choice[0]][choice[1]].addPeg()
-		self.turn = False
+		self.hit = self.parent.player.holes[choice[0]][choice[1]].addPeg()
+		#if self.hit == True:
+		#	self.choice = choice
+		"""elif self.hit == True:		
+			if self.vertical == True:
+				if self.jump == 1:
+					temp = self.choice[:]
+					temp[1]+=self.jump
+					if temp not in self.choices:
+						self.jump = -1
+						return False
+					elif temp[1] > 8:
+						self.jump = -1
+						return False
+					else:
+						self.choices.remove(temp)
+						self.hit = self.parent.player.holes[temp[0]][temp[1]].addPeg()
+						if self.hit == False:
+							self.hit = True
+							self.jump = -1
+						else:
+							if self.holes[temp[0]][temp[1]].sunk == True:
+								self.hit = False
+								self.jump = 1
+								return True
+							else:
+								self.jump += 1
+				elif self.jump == -1:
+					temp = self.choice[:]
+					temp[1]+=self.jump
+					if temp not in self.choices:
+						self.vertical = False
+						self.jump = 1
+						return False
+					elif temp[1] < 0:
+						self.vertical = False
+						self.jump = 1
+						return False
+					else:
+						self.choices.remove(temp)
+						self.hit = self.parent.player.holes[temp[0]][temp[1]].addPeg()						
+						if self.hit == False:
+							self.hit = True
+							self.vertical = False
+							self.jump = 1
+						else:
+							if self.holes[temp[0]][temp[1]].sunk == True:
+								self.hit = False
+								self.jump = 1
+								return True
+							else:
+								self.jump -= 1				
+
+				else:
+					temp = self.choice[:]
+					temp[1]+=self.jump
+					if temp not in self.choices:
+						if self.jump > 0:
+							self.jump = -1
+							return False
+					elif temp[1] > 8:
+						self.jump = -1
+					elif temp[1] < 0:
+						if self.holes[temp[0]][temp[1]].sunk == True:
+							self.hit = False
+							self.jump = 1
+							return True
+					else:	
+						self.choices.remove(temp)
+						self.hit = self.parent.player.holes[temp[0]][temp[1]].addPeg()
+						if self.hit == True:
+							if self.jump > 0:
+								self.jump+=1
+							else:
+								self.jump-=1
+							if self.holes[temp[0]][temp[1]].sunk == True:
+								self.hit = False
+								return True
+						else:
+							if self.holes[temp[0]][temp[1]].sunk == True:
+								self.hit = False
+								self.jump = 1
+								return True
+							else:
+								self.hit = True
+								self.jump = -1
+			elif self.vertical == False:
+				if self.jump == 1:
+					temp = self.choice[:]
+					temp[0]+=self.jump
+					if temp not in self.choices:
+						self.jump = -1
+						return False
+					elif temp[0] > 8:
+						self.jump = -1
+					else:
+						self.choices.remove(temp)
+						self.hit = self.parent.player.holes[temp[0]][temp[1]].addPeg()
+						if self.hit == False:
+							self.hit = True
+							self.jump = -1
+						else:
+							if self.holes[temp[0]][temp[1]].sunk == True:
+								self.hit = False
+								self.jump = 1
+								return True
+							else:
+								self.jump += 1				
+				elif self.jump == -1:
+					temp = self.choice[:]
+					temp[0]+=self.jump
+					if temp not in self.choices:
+						self.jump = 1
+						self.hit = False
+						return False
+					self.choices.remove(temp)
+					self.hit = self.parent.player.holes[temp[0]][temp[1]].addPeg()
+					if self.holes[temp[0]][temp[1]].sunk == True:
+						self.hit = False
+						self.jump = 1
+						return True
+					else:
+						self.jump -= 1
+				else:
+					temp = self.choice[:] 
+					temp[0]+=self.jump
+					if temp not in self.choices:
+						if self.jump > 0:
+							self.jump = -1
+							return False
+						else:
+							self.jump = 1
+							self.hit = False
+							return False
+					elif temp[0] > 8:
+						self.jump = -1	
+					elif temp[0] < 0:
+						if self.holes[temp[0]][temp[1]].sunk == True:
+							self.hit = False
+							self.jump = 1
+							return True			
+					else:
+						self.choices.remove(temp)
+						self.hit = self.parent.player.holes[temp[0]][temp[1]].addPeg()
+						if self.hit == True:
+							if self.jump > 0:
+								self.jump+=1
+							else:
+								self.jump-=1
+							if self.holes[temp[0]][temp[1]].sunk == True:
+								self.hit = False
+								self.jump= 1
+								return True
+						else:
+							if self.holes[temp[0]][temp[1]].sunk == True:
+								self.hit = False
+								self.jump = 1
+								return True
+							else:
+								self.hit = True
+								self.jump = -1				
+
+			return True"""
 		
 	def createChoices(self):
 		for i in range(9):
@@ -303,13 +469,17 @@ class computerHole(QtWidgets.QWidget):
 				self.hit = True
 				self.update()
 				self.parent.check()
-				self.parent.turn = True
-				self.parent.move()
 			else:
 				self.peg = True
 				self.update()
+
+			self.parent.turn = True
+			#temp = self.parent.move()
+			self.parent.move()
+			"""while temp == False:
 				self.parent.turn = True
-				self.parent.move()
+				temp = self.parent.move()"""
+			self.parent.turn = False
 
 	#Used by parent function to keep track of ship widgets
 	def isShip(self):
@@ -361,7 +531,7 @@ class playerHole(QtWidgets.QWidget):
 			qp.drawEllipse((self.width()-self.circle)/2,(self.height()-self.circle)/2,self.circle,self.circle)
 			qp.end()
 
-	#called by computer whenit makes a move
+	#called by computer when it makes a move
 	#makes necessary checks and updates
 	#then switches to player turn
 	def addPeg(self):
@@ -371,10 +541,12 @@ class playerHole(QtWidgets.QWidget):
 			self.update()
 			self.parent.check()
 			self.parent.parent.enemy.turn = False
+			return True
 		else:
 			self.peg = True
 			self.update()
-			self.parent.parent.enemy.turn = False			
+			self.parent.parent.enemy.turn = False
+			return False			
 	
 	#Used by parent function to keep track of ship widgets
 	#makes player ships visible
