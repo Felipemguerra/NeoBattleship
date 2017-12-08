@@ -17,8 +17,7 @@ Proposal:
 Missing Features:
 	-drag and drop ship placements for player
 	-sophisticated ship placement algorithm for computer
-	-third difficulty that could replace current "Hard" difficulty
-		-use clustering to make better dicisions on where to find ships
+	-hard difficulty that uses clustering to make better dicisions on where to find ships
 	-networking
 	-multiplayer
 
