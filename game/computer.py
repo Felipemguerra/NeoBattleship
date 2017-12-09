@@ -4,10 +4,10 @@ import computerhole, shared, random
 class computer(QtWidgets.QWidget):
 	def __init__(self, parent, diff):
 		QtWidgets.QWidget.__init__(self, parent)
-		#set the size of board
+		#set the size of board based on shared screen proportions
 		self.setFixedSize(shared.APP_WIDTH, shared.APP_HEIGHT)
 		#set background as water imaqe
-		b = QtGui.QBrush(QtGui.QImage('images/water.bmp'))
+		b = QtGui.QBrush(QtGui.QImage('./images/water.jpeg'))
 		p = self.palette()
 		p.setBrush(self.backgroundRole(), b)
 		self.setPalette(p)
@@ -22,11 +22,10 @@ class computer(QtWidgets.QWidget):
 		self.choices = []
 		self.createChoices()
 		#choose random ship mapping and place ships
-		#room for improvement
 		self.ships = random.choice(shared.SHIPS)
 		self.status = []
 		self.placeShips()
-		#store all necessary information
+		#store all necessary information for computer decision algorithm
 		self.parent = parent
 		self.turn = False
 		self.hit = False
@@ -34,7 +33,7 @@ class computer(QtWidgets.QWidget):
 		self.jump = 1
 		self.difficulty = diff
 
-	#draw grid
+	#draw grid based on grid widgets x,y values
 	def paintEvent(self, event):
 		qp = QtGui.QPainter()
 		qp.begin(self)
@@ -49,7 +48,7 @@ class computer(QtWidgets.QWidget):
 		qp.drawLine(QtCore.QLine(self.holes[0][8].x(), self.holes[0][8].y() + self.holes[0][8].height(), self.holes[8][8].x() + self.holes[8][8].width(), self.holes[8][8].y() + self.holes[8][8].height()))
 		qp.end()
 
-	#populate grid layout with widgets
+	#populate grid layout and holes list with widgets
 	def place_holes(self):
 		for row in range(9):
 			temp = []
@@ -59,7 +58,8 @@ class computer(QtWidgets.QWidget):
 				temp.append(hole)
 			self.holes.append(temp[:])
 
-	#use random ship layout and mark necessary widgets
+	#use random ship layout and mark necessary widgets as having a ship
+	#used to determine if a peg placement is a hit or miss
 	def placeShips(self):
 		for ship in self.ships:
 			temp = []
@@ -75,7 +75,7 @@ class computer(QtWidgets.QWidget):
 			self.status.append(temp2)
 
 	#Called after player turn
-	#checks ships and marks and sunken if necessary
+	#checks ships and marks any sunken if necessary
 	#check if player has won
 	#call win message if necessary
 	def check(self):
@@ -100,7 +100,9 @@ class computer(QtWidgets.QWidget):
 			elif reply == QtWidgets.QMessageBox.No:
 				quit()
 
-	#simple function that makes random computer move
+	#function called after player makes a move and is locked out of making another move
+	#easy difficulty makes random choices
+	#medium difficulty makes random choices and uses decision algorithm upon hit
 	def move(self):
 		if self.difficulty == 0:
 			choice = random.choice(self.choices)
@@ -124,8 +126,17 @@ class computer(QtWidgets.QWidget):
 			#Missing third difficulty
 			None			
 
-	#decision algorithm only works if ships are not place directly touching
-	def decision(self):		
+	#checks in order upon first hit:
+		#-under
+		#-above
+		#-right
+		#-left
+	#once direction is found, algorithm continues in that direction and
+	#then in the other if not yet sunk
+	#decision algorithm only works if ships are not placed directly touching
+	#possible errors print with file and line number
+	def decision(self):
+		#vertical		
 		if self.vertical == True:
 			temp = self.choice[:]
 			temp[1]+=self.jump
@@ -138,7 +149,7 @@ class computer(QtWidgets.QWidget):
 					self.vertical = False
 					return False
 				elif self.jump < -1:
-					print("battleship/computer.py	error 302")
+					print("battleship/computer.py	error 152")
 					self.hit = False
 			else:
 				self.choices.remove(temp)
@@ -157,7 +168,7 @@ class computer(QtWidgets.QWidget):
 						self.jump = 1
 						self.vertical = False
 					elif self.jump < -1:
-						print("battleship/computer.py	error 321")
+						print("battleship/computer.py	error 171")
 						self.hit = False
 		#Horizontal
 		elif self.vertical == False:
@@ -168,7 +179,7 @@ class computer(QtWidgets.QWidget):
 					self.jump = -1
 					return False
 				elif self.jump < 0:
-					print("battleship/computer.py	error 332")
+					print("battleship/computer.py	error 182")
 					self.hit = False
 			else:
 				self.choices.remove(temp)
@@ -184,7 +195,7 @@ class computer(QtWidgets.QWidget):
 					if self.jump > 0:
 						self.jump = -1
 					elif self.jump < 0:
-						print("battleship/computer.py	error 348")
+						print("battleship/computer.py	error 198")
 						self.hit = False		
 		return True
 		

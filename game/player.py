@@ -4,10 +4,10 @@ import playerhole, shared, random
 class player(QtWidgets.QWidget):
 	def __init__(self, parent):
 		QtWidgets.QWidget.__init__(self, parent)
-		#set the size of board
+		#set the size of board based on shared resolution variables
 		self.setFixedSize(shared.APP_WIDTH, shared.APP_HEIGHT)
 		#set background as water imaqe
-		b = QtGui.QBrush(QtGui.QImage('images/water.bmp'))
+		b = QtGui.QBrush(QtGui.QImage('./images/water.jpeg'))
 		p = self.palette()
 		p.setBrush(self.backgroundRole(), b)
 		self.setPalette(p)
@@ -19,14 +19,12 @@ class player(QtWidgets.QWidget):
 		self.holes = []
 		self.place_holes()
 		#choose random ship mapping and place ships
-		#room for improvement
 		self.ships = random.choice(shared.SHIPS)
 		self.status = []	
 		self.placeShips()
-		#store parent
 		self.parent = parent
 
-	#draw grid
+	#draw player grid based on x,y of holes
 	def paintEvent(self, event):
 		qp = QtGui.QPainter()
 		qp.begin(self)
@@ -41,7 +39,7 @@ class player(QtWidgets.QWidget):
 		qp.drawLine(QtCore.QLine(self.holes[0][8].x(), self.holes[0][8].y() + self.holes[0][8].height(), self.holes[8][8].x() + self.holes[8][8].width(), self.holes[8][8].y() + self.holes[8][8].height()))
 		qp.end()
 
-	#populate grid layout with widgets
+	#populate grid layout and holes list with widgets
 	def place_holes(self):
 		for row in range(9):
 			temp = []
@@ -51,8 +49,8 @@ class player(QtWidgets.QWidget):
 				temp.append(hole)
 			self.holes.append(temp[:])
 
-	#use random ship layout and mark necessary
-	#widgets
+	#use random ship layout and mark necessary widgets as having a ship
+	#used to determine if peg placement results in hit or miss
 	def placeShips(self):
 		for ship in self.ships:
 			temp = []
@@ -68,7 +66,7 @@ class player(QtWidgets.QWidget):
 			self.status.append(temp2)
 
 	#Called after computer turn
-	#checks ships and marks and sunken if necessary
+	#checks ships and marks any sunken if necessary
 	#check if computer has won
 	#call lose message if necessary
 	def check(self):

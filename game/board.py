@@ -5,7 +5,7 @@ class gameboard(QtWidgets.QWidget):
 	def __init__(self, parent, diff):
 		QtWidgets.QWidget.__init__(self)
 		#set background color
-		b = QtGui.QBrush(QtGui.QImage('images/metal.jpg'))
+		b = QtGui.QBrush(QtGui.QImage('./images/metal.jpg'))
 		p = self.palette()
 		p.setBrush(self.backgroundRole(), b)
 		self.setPalette(p)

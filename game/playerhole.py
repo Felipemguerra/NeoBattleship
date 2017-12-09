@@ -18,7 +18,7 @@ class playerHole(QtWidgets.QWidget):
 		if self.peg == True and self.hit == True and self.sunk == False:
 			qp = QtGui.QPainter()
 			qp.begin(self)
-			brush = QtGui.QBrush(QtGui.QImage('images/explosion.jpg'))
+			brush = QtGui.QBrush(QtGui.QImage('./images/explosion.jpg'))
 			qp.setBrush(brush)
 			qp.drawEllipse((self.width()-self.circle)/2,(self.height()-self.circle)/2,self.circle,self.circle)
 			qp.end()
@@ -34,9 +34,8 @@ class playerHole(QtWidgets.QWidget):
 			qp.drawEllipse((self.width()-self.circle)/2,(self.height()-self.circle)/2,self.circle,self.circle)
 			qp.end()
 
-	#called by computer when it makes a move
+	#called by computer decision algorithm when it makes a move
 	#makes necessary checks and updates
-	#then switches to player turn
 	def addPeg(self):
 		if self.ship == True:
 			self.peg = True
@@ -49,21 +48,21 @@ class playerHole(QtWidgets.QWidget):
 			self.update()
 			self.parent.parent.enemy.turn = False		
 	
-	#Used by parent function to keep track of ship widgets
+	#Used by parent function to mark pegs as having a ship
 	#makes player ships visible
 	def isShip(self):
 		self.ship = True
-		b = QtGui.QBrush(QtGui.QImage('images/ship.jpg'))
+		b = QtGui.QBrush(QtGui.QImage('./images/ship.jpg'))
 		p = self.palette()
 		p.setBrush(self.backgroundRole(), b)
 		self.setPalette(p)
 		self.setAutoFillBackground(True)
 		self.update()
 
-	#color ship red when it sinks
+	#color ship when it sinks
 	def sunken(self):
 		self.sunk = True
-		b = QtGui.QBrush(QtGui.QImage('images/explosion.jpg'))
+		b = QtGui.QBrush(QtGui.QImage('./images/explosion.jpg'))
 		p = self.palette()
 		p.setBrush(self.backgroundRole(), b)
 		self.setPalette(p)

@@ -1,9 +1,14 @@
 NeoBattleship - Group Project
 
+https://github.com/Felipemguerra/NeoBattleship
+
 Members: Ernest Besse, Brian Smith, Felipe Guerra
 
 PyQt5 Documentation: http://pyqt.sourceforge.net/Docs/PyQt5/modules.html
 
+Execution: Game can be run by executing start script "./start" 
+	   or by going into the "game" directory and running 
+	   "python3 game.py"
 
 Proposal:
 	This project implements a simple version of the classic "Battleship" game 
@@ -35,13 +40,13 @@ Libraries used:
 	-random
 
 Image Resources used:
-	water.bmp: used as board backgrounds
-	metal.jpg and ship.jpg("modified metal.jpg"): used to show player ships
-	explosion.jpg(modified original): used to show hits on the board and sunken ships
+	water.jpeg: used as board backgrounds
+		-https://pxhere.com/en/photo/1373790
+	metal.jpg and ship.jpg: used to show player ships
+		-https://pixnio.com/textures-and-patterns/metal-texture/aluminium-gray-textured-metal-sheet-metal-texture
+	explosion.jpg: used to show hits on the board and sunken ships
 		-https://pixabay.com/en/explosion-fire-brand-destroy-1039943/
- 
 
-Work Distribution:
 
 
 

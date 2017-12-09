@@ -18,7 +18,7 @@ class computerHole(QtWidgets.QWidget):
 		if self.peg == True and self.ship == True and self.sunk == False:
 			qp = QtGui.QPainter()
 			qp.begin(self)
-			brush = QtGui.QBrush(QtGui.QImage('images/explosion.jpg'))
+			brush = QtGui.QBrush(QtGui.QImage('./images/explosion.jpg'))
 			qp.setBrush(brush)
 			qp.drawEllipse((self.width()-self.circle)/2,(self.height()-self.circle)/2,self.circle,self.circle)
 			qp.end()
@@ -36,7 +36,9 @@ class computerHole(QtWidgets.QWidget):
 
 	#reads in players hole choice
 	#makes necessary checks and updates
+	#locks out player
 	#then switches to computer turn
+	#unlocks player
 	def mousePressEvent(self, event):
 		if self.peg == False and self.parent.turn == False:
 			self.parent.turn = True
@@ -51,15 +53,15 @@ class computerHole(QtWidgets.QWidget):
 			self.parent.move()
 			self.parent.turn = False
 
-	#Used by parent function to keep track of ship widgets
+	#Used by parent function to mark necessary pegs as having a ship
 	def isShip(self):
 		self.ship = True
 		self.update()
 
-	#color ship red when it sinks
+	#color ship when it sinks
 	def sunken(self):
 		self.sunk = True
-		b = QtGui.QBrush(QtGui.QImage('images/explosion.jpg'))
+		b = QtGui.QBrush(QtGui.QImage('./images/explosion.jpg'))
 		p = self.palette()
 		p.setBrush(self.backgroundRole(), b)
 		self.setPalette(p)

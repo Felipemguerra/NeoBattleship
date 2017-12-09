@@ -35,6 +35,7 @@ class gameWindow(QtWidgets.QMainWindow):
 		self.setCentralWidget(self.game_grid)        
 		self.show()
 
+	#difficulty functions
 	def set_hard(self):
 		self.diff = 2
 		self.setup()
@@ -46,7 +47,7 @@ class gameWindow(QtWidgets.QMainWindow):
 	def set_easy(self):
 		self.diff = 0
 		self.setup()
-	
+	#close message functions
 	def closeEvent(self, event):
 		reply = quitMessage().exec_()
 		if reply == QtWidgets.QMessageBox.Yes:
